@@ -70,13 +70,13 @@ function App() {
         px: 0,
       }}
     >
-      <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
+      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4, md: 8 }, px: { xs: 1, sm: 2 } }}>
         <Paper
           elevation={4}
           sx={{
-            p: { xs: 2, sm: 4 },
-            mb: 4,
-            borderRadius: 4,
+            p: { xs: 2, sm: 3, md: 4 },
+            mb: { xs: 2, sm: 3, md: 4 },
+            borderRadius: { xs: 2, sm: 3, md: 4 },
             boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.10)',
             background: 'rgba(255,255,255,0.95)',
           }}
@@ -89,18 +89,27 @@ function App() {
               fontWeight: 700,
               letterSpacing: 1,
               color: '#1a237e',
-              mb: 2,
+              mb: { xs: 1, sm: 2 },
+              fontSize: { xs: '1.75rem', sm: '2.125rem', md: '3rem' },
             }}
           >
             Nigerian Bank Finder
           </Typography>
-          <Typography align="center" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography 
+            align="center" 
+            color="text.secondary" 
+            sx={{ 
+              mb: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              px: { xs: 1, sm: 0 }
+            }}
+          >
             Find all branches of your favorite Nigerian banks by state. Powered by naija-banks-branches-sortcode.
           </Typography>
           <Box
             display="flex"
             flexDirection={{ xs: 'column', sm: 'row' }}
-            gap={2}
+            gap={{ xs: 1.5, sm: 2 }}
             alignItems="center"
             justifyContent="center"
             mb={1}
@@ -113,7 +122,7 @@ function App() {
               onClick={handleSearch}
               disabled={!selectedBank || !selectedState || loading}
               sx={{
-                minWidth: 160,
+                minWidth: { xs: '100%', sm: 160 },
                 py: 1.2,
                 fontWeight: 600,
                 borderRadius: 2,
@@ -137,9 +146,9 @@ function App() {
           <Paper
             elevation={2}
             sx={{
-              p: { xs: 2, sm: 3 },
+              p: { xs: 1.5, sm: 2, md: 3 },
               minHeight: 200,
-              borderRadius: 3,
+              borderRadius: { xs: 2, sm: 3 },
               background: 'rgba(255,255,255,0.98)',
               boxShadow: '0 4px 16px 0 rgba(31, 38, 135, 0.07)',
               mt: 2
@@ -158,16 +167,33 @@ function App() {
             )}
             {!loading && results.length > 0 && (
               <>
-                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                <Box 
+                  display="flex" 
+                  flexDirection={{ xs: 'column', sm: 'row' }}
+                  alignItems={{ xs: 'stretch', sm: 'center' }} 
+                  gap={{ xs: 1, sm: 2 }} 
+                  mb={2}
+                >
                   <TextField
                     label="Search branches"
                     variant="outlined"
                     size="small"
                     value={filter}
                     onChange={e => setFilter(e.target.value)}
-                    sx={{ maxWidth: 320, background: '#f5f7fa', borderRadius: 2 }}
+                    sx={{ 
+                      maxWidth: { xs: '100%', sm: 320 }, 
+                      background: '#f5f7fa', 
+                      borderRadius: 2 
+                    }}
                   />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ 
+                      textAlign: { xs: 'center', sm: 'left' },
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                    }}
+                  >
                     Showing {results.filter(r =>
                       r.branch.toLowerCase().includes(filter.toLowerCase()) ||
                       r.branchaddress.toLowerCase().includes(filter.toLowerCase()) ||

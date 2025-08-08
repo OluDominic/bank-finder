@@ -11,6 +11,11 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Tooltip from '@mui/material/Tooltip';
 import Pagination from '@mui/material/Pagination';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 const ROWS_PER_PAGE = 20;
 
@@ -18,6 +23,8 @@ const ResultsTable = ({ results, filter = '' }) => {
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [copiedType, setCopiedType] = useState(null); // 'address' or 'code'
   const [page, setPage] = useState(1);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleCopy = async (text, idx, type) => {
     try {
@@ -52,6 +59,69 @@ const ResultsTable = ({ results, filter = '' }) => {
     }
   }, [filter, filtered.length]);
 
+  // Mobile card view
+  if (isMobile) {
+    return (
+      <Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, textAlign: 'center' }}>
+          Showing {filtered.length} of {results.length} branches
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          {paginated.map((state, i) => (
+            <Card key={i + (page - 1) * ROWS_PER_PAGE} sx={{ mb: 1 }}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                  {state.branch}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <strong>Code:</strong> {state.branchcode}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 2, fontSize: '0.875rem' }}>
+                  <strong>Address:</strong> {state.branchaddress}
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Tooltip title={copiedIdx === i && copiedType === 'address' ? 'Copied!' : 'Copy Address'} placement="top" arrow>
+                    <IconButton 
+                      onClick={() => handleCopy(state.branchaddress, i, 'address')} 
+                      size="small"
+                      sx={{ bgcolor: 'primary.light', color: 'white', '&:hover': { bgcolor: 'primary.main' } }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={copiedIdx === i && copiedType === 'code' ? 'Copied!' : 'Copy Code'} placement="top" arrow>
+                    <IconButton 
+                      onClick={() => handleCopy(state.branchcode, i, 'code')} 
+                      size="small"
+                      sx={{ bgcolor: 'secondary.light', color: 'white', '&:hover': { bgcolor: 'secondary.main' } }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+        {pageCount > 1 && (
+          <Box display="flex" justifyContent="center" mt={3}>
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={(_, value) => setPage(value)}
+              color="primary"
+              shape="rounded"
+              size="small"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        )}
+      </Box>
+    );
+  }
+
+  // Desktop table view
   return (
     <Box>
       <TableContainer component={Paper}>
