@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Tooltip from '@mui/material/Tooltip';
 import Pagination from '@mui/material/Pagination';
 import Box from '@mui/material/Box';
@@ -19,7 +21,7 @@ import { useTheme } from '@mui/material/styles';
 
 const ROWS_PER_PAGE = 20;
 
-const ResultsTable = ({ results, filter = '' }) => {
+const ResultsTable = ({ results, filter = '', favorites = [], toggleFavorite }) => {
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [copiedType, setCopiedType] = useState(null); // 'address' or 'code'
   const [page, setPage] = useState(1);
@@ -35,12 +37,10 @@ const ResultsTable = ({ results, filter = '' }) => {
         setCopiedIdx(null);
         setCopiedType(null);
       }, 1200);
-    } catch (err) {
+    } catch {
       // Optionally handle error
     }
   };
-
-  if (!results || results.length === 0) return null;
 
   const filtered = results.filter(r =>
     r.branch.toLowerCase().includes(filter.toLowerCase()) ||
@@ -57,7 +57,13 @@ const ResultsTable = ({ results, filter = '' }) => {
     if ((page - 1) * ROWS_PER_PAGE >= filtered.length) {
       setPage(1);
     }
-  }, [filter, filtered.length]);
+  }, [filter, filtered.length, page]);
+
+  if (!results || results.length === 0) return null;
+
+  const isFavorite = (branch) => {
+    return favorites.some(f => f.branchcode === branch.branchcode);
+  };
 
   // Mobile card view
   if (isMobile) {
@@ -70,9 +76,20 @@ const ResultsTable = ({ results, filter = '' }) => {
           {paginated.map((state, i) => (
             <Card key={i + (page - 1) * ROWS_PER_PAGE} sx={{ mb: 1 }}>
               <CardContent sx={{ p: 2 }}>
-                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                  {state.branch}
-                </Typography>
+                <Box display="flex" justifyContent="space-between" alignItems="start" mb={1}>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    {state.branch}
+                  </Typography>
+                  <Tooltip title={isFavorite(state) ? 'Remove from favorites' : 'Add to favorites'}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => toggleFavorite(state)}
+                      color="error"
+                    >
+                      {isFavorite(state) ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderIcon fontSize="small" />}
+                    </IconButton>
+                  </Tooltip>
+                </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   <strong>Code:</strong> {state.branchcode}
                 </Typography>
@@ -136,6 +153,7 @@ const ResultsTable = ({ results, filter = '' }) => {
               <TableCell>Address</TableCell>
               <TableCell>Copy Address</TableCell>
               <TableCell>Copy Code</TableCell>
+              <TableCell>Favorite</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -155,6 +173,13 @@ const ResultsTable = ({ results, filter = '' }) => {
                   <Tooltip title={copiedIdx === i && copiedType === 'code' ? 'Copied!' : 'Copy Code'} placement="top" arrow>
                     <IconButton onClick={() => handleCopy(state.branchcode, i, 'code')} size="small">
                       <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Tooltip title={isFavorite(state) ? 'Remove from favorites' : 'Add to favorites'}>
+                    <IconButton onClick={() => toggleFavorite(state)} size="small" color="error">
+                      {isFavorite(state) ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderIcon fontSize="small" />}
                     </IconButton>
                   </Tooltip>
                 </TableCell>
